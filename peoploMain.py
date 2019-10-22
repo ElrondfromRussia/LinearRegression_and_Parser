@@ -120,6 +120,7 @@ for i in range(1, 51):
     #url4 = "https://www.superjob.ru/resume/search_resume.html?payment_no_agreement=1&catalogues%5B0%5D=197&t%5B0%5D=4&page="+str(i)
 
     pages1 = get_pages(get_htm(url1))
+    print(pages1)
     # pages2 = get_pages(get_htm(url2))
     #pages3 = get_pages(get_htm(url3))
     #pages4 = get_pages(get_htm(url4))

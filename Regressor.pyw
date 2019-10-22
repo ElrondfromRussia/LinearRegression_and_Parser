@@ -1,4 +1,5 @@
 import sys
+import os
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QPixmap
 import design
@@ -17,11 +18,11 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.setupUi(self)
         self.btn_go.clicked.connect(self.gogo)
         self.works = 0
-        self.view1  = pg.PlotWidget()
+        self.view1 = pg.PlotWidget()
         self.vl1.addWidget(self.view1)
-        self.view2  = pg.PlotWidget()
+        self.view2 = pg.PlotWidget()
         self.vl2.addWidget(self.view2)
-        self.view3  = pg.PlotWidget()
+        self.view3 = pg.PlotWidget()
         self.vl3.addWidget(self.view3)
 
     def gogo(self):
@@ -35,21 +36,21 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.oldness = self.sb_old.value()
         self.build_model()
         self.statusbar.showMessage("Finished")
-        
+
     def build_model(self):
         try:
             if self.sphere == 0:
-                df = pd.DataFrame.from_csv("ExpertDoctors.csv")
+                df = pd.read_csv("ExpertDoctors.csv", delimiter=',')
             else:
                 if self.sphere == 1:
-                    df = pd.DataFrame.from_csv("Drivers.csv")
+                    df = pd.read_csv("Drivers.csv", delimiter=',')
                 else:
                     if self.sphere == 2:
-                        df = pd.DataFrame.from_csv("Tourizm.csv")
+                        df = pd.read_csv("Tourizm.csv", delimiter=',')
                     else:
-                        df = pd.DataFrame.from_csv("ITschnimi.csv")
+                        df = pd.read_csv("ITschnimi.csv", delimiter=',')
 
-            x = df.iloc[:,:-1]
+            x = df.iloc[:, :-1]
             y = df.iloc[:, -1]
             x_ = sm.add_constant(x)
             smm = sm.OLS(y, x_)
@@ -63,12 +64,12 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
             x3 = np.array(x["#obrazovan"])
         
             for i in range(len(y)):
-                pred_y1.append(res.params[0] + res.params[1]*x1[i]+ res.params[2]*self.opit + res.params[3]*self.obrazov)
-                pred_y2.append(res.params[0]+ res.params[1]*self.oldness + res.params[2]*x2[i] + res.params[3]*self.obrazov)
-                pred_y3.append(res.params[0] + res.params[1]*self.oldness+ res.params[2]*self.opit + res.params[3]*x3[i])
+                pred_y1.append(res.params[0] + res.params[1]*x1[i] + res.params[2]*self.opit + res.params[3]*self.obrazov)
+                pred_y2.append(res.params[0] + res.params[1]*self.oldness + res.params[2]*x2[i] + res.params[3]*self.obrazov)
+                pred_y3.append(res.params[0] + res.params[1]*self.oldness + res.params[2]*self.opit + res.params[3]*x3[i])
         
-            pw1 = pg.PlotCurveItem(x = x1, y = pred_y1, pen=pg.mkPen('b', width=2)) 
-            s1 = pg.ScatterPlotItem(x["#age"],y, pen='r')
+            pw1 = pg.PlotCurveItem(x=x1, y=pred_y1, pen=pg.mkPen('b', width=2))
+            s1 = pg.ScatterPlotItem(x["#age"], y, pen='r')
             self.view1.addItem(s1)
             self.view1.addItem(pw1)
             self.view1.replot()
@@ -76,8 +77,8 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
             self.view1.setLabel("left", text="ЗП, руб")
             self.view1.setLabel("bottom", text="Возраст, лет")
             
-            pw2 = pg.PlotCurveItem(x = x2, y = pred_y2, pen=pg.mkPen('#000', width=2)) 
-            s2 = pg.ScatterPlotItem(x["#opit"],y, pen='g')
+            pw2 = pg.PlotCurveItem(x=x2, y=pred_y2, pen=pg.mkPen('#000', width=2))
+            s2 = pg.ScatterPlotItem(x["#opit"], y, pen='g')
             self.view2.addItem(s2)
             self.view2.addItem(pw2)
             self.view2.replot()
@@ -85,7 +86,7 @@ class MyApp(QtWidgets.QMainWindow, design.Ui_MainWindow):
             self.view2.setLabel("left", text="ЗП, руб")
             self.view2.setLabel("bottom", text="Опыт, мес")
         
-            pw3 = pg.PlotCurveItem(x = x3, y = pred_y3, pen=pg.mkPen('r', width=2))
+            pw3 = pg.PlotCurveItem(x=x3, y=pred_y3, pen=pg.mkPen('r', width=2))
             s3 = pg.ScatterPlotItem(x["#obrazovan"],y, pen="#ccc")
             self.view3.addItem(s3)
             self.view3.addItem(pw3)
@@ -125,6 +126,7 @@ def main():
     window = MyApp()
     window.show()
     app.exec_()
-    
+
+
 if __name__ == '__main__':
     main()
